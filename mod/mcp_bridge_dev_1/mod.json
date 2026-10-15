@@ -1,0 +1,56 @@
+{
+  "modId": "mcp_bridge_dev_1",
+  "revision": 7,
+  "severityAdd": "None",
+  "severityRemove": "None",
+  "visible": true,
+  "cosmetic": true,
+  "dependencies": null,
+  "incompatibilities": null,
+  "options": null,
+  "preRunScript": {
+    "fileName": ""
+  },
+  "runScript": {
+    "fileName": ""
+  },
+  "postRunScript": {
+    "fileName": ""
+  },
+  "params": [
+    {
+      "key": "budget",
+      "name": "param_budget_name",
+      "tooltip": "param_budget_tooltip",
+      "uiType": "Button",
+      "values": [
+        "param_budget_light",
+        "param_budget_normal",
+        "param_budget_fast"
+      ],
+      "defaultIndex": 1
+    },
+    {
+      "key": "towns",
+      "name": "param_towns_name",
+      "tooltip": "param_towns_tooltip",
+      "uiType": "Button",
+      "values": [
+        "param_yes",
+        "param_no"
+      ],
+      "defaultIndex": 0
+    },
+    {
+      "key": "logEach",
+      "name": "param_logEach_name",
+      "tooltip": "param_logEach_tooltip",
+      "uiType": "Button",
+      "values": [
+        "param_no",
+        "param_yes"
+      ],
+      "defaultIndex": 0
+    }
+  ]
+}

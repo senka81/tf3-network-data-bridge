@@ -1,2 +1,17 @@
 __pycache__/
 *.pyc
+
+# Local runtimes, telemetry and credentials (never publish)
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+*.bak
+*.backup*
+*BACKUP.py
+mcp_bridge__*
+.tf3-network-planner/
+dev-history/
+history/
+*.log

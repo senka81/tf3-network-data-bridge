@@ -1,0 +1,296 @@
+{
+  "tf3_status": {
+    "type": "object",
+    "properties": {}
+  },
+  "tf3_list_lines": {
+    "type": "object",
+    "properties": {
+      "sort_by": {
+        "type": "string",
+        "enum": [
+          "estIncome12m",
+          "name",
+          "profit12m",
+          "profitPerVehicle12m",
+          "runningCostsPerYear",
+          "usagePct",
+          "vehicleCount"
+        ],
+        "description": "default profit12m"
+      },
+      "ascending": {
+        "type": "boolean",
+        "description": "default false (largest first), except for name"
+      },
+      "carrier": {
+        "type": "string",
+        "enum": [
+          "ROAD",
+          "RAIL",
+          "TRAM",
+          "AIR",
+          "WATER"
+        ]
+      },
+      "name_contains": {
+        "type": "string"
+      },
+      "town": {
+        "type": "string",
+        "description": "only lines with a stop in a town whose name contains this"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "default 50"
+      }
+    }
+  },
+  "tf3_list_towns": {
+    "type": "object",
+    "properties": {
+      "name_contains": {
+        "type": "string"
+      },
+      "sort_by": {
+        "type": "string",
+        "enum": [
+          "lineUsage",
+          "linesServing",
+          "name",
+          "population",
+          "size"
+        ],
+        "description": "default population"
+      },
+      "ascending": {
+        "type": "boolean",
+        "description": "default false (largest first)"
+      },
+      "include_lines": {
+        "type": "boolean",
+        "description": "list serving lines (default: only when filtering by name)"
+      },
+      "include_cargo": {
+        "type": "boolean",
+        "description": "goods each district needs and the supply vs limit (default: only when filtering by name)"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "default 100"
+      }
+    }
+  },
+  "tf3_route_ideas": {
+    "type": "object",
+    "properties": {
+      "town": {
+        "type": "string",
+        "description": "only pairs involving towns whose name contains this"
+      },
+      "min_population": {
+        "type": "number",
+        "description": "ignore smaller towns"
+      },
+      "min_distance_km": {
+        "type": "number"
+      },
+      "max_distance_km": {
+        "type": "number",
+        "description": "e.g. 15 for buses, 150 for regional rail"
+      },
+      "include_linked": {
+        "type": "boolean",
+        "description": "also list pairs your lines already link"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "default 25"
+      }
+    }
+  },
+  "tf3_get_line": {
+    "type": "object",
+    "properties": {
+      "line": {
+        "type": "string",
+        "description": "line id or (part of) its name"
+      }
+    },
+    "required": [
+      "line"
+    ]
+  },
+  "tf3_list_vehicle_models": {
+    "type": "object",
+    "properties": {
+      "carrier": {
+        "type": "string",
+        "enum": [
+          "ROAD",
+          "RAIL",
+          "TRAM",
+          "AIR",
+          "WATER"
+        ]
+      },
+      "transport_mode": {
+        "type": "string",
+        "description": "e.g. BUS, TRUCK, TRAIN, ELECTRIC_TRAIN, TRAM"
+      },
+      "name_contains": {
+        "type": "string"
+      },
+      "min_capacity": {
+        "type": "integer"
+      },
+      "available_only": {
+        "type": "boolean",
+        "description": "default true"
+      },
+      "include_hidden": {
+        "type": "boolean",
+        "description": "default false"
+      },
+      "sort_by": {
+        "type": "string",
+        "enum": [
+          "capacity",
+          "price",
+          "topSpeedKmh",
+          "powerKw",
+          "lifespanDays"
+        ]
+      },
+      "limit": {
+        "type": "integer",
+        "description": "default 60"
+      }
+    }
+  },
+  "tf3_list_industries": {
+    "type": "object",
+    "properties": {
+      "cargo": {
+        "type": "string",
+        "description": "only industries using or making this cargo, e.g. COAL"
+      },
+      "town": {
+        "type": "string",
+        "description": "closest town name contains"
+      },
+      "status": {
+        "type": "string",
+        "enum": [
+          "missing_inputs",
+          "not_producing",
+          "closing",
+          "unshipped",
+          "all"
+        ],
+        "description": "default all"
+      },
+      "sort_by": {
+        "type": "string",
+        "enum": [
+          "producedPerYear",
+          "shippedPerYear",
+          "level",
+          "name"
+        ]
+      },
+      "include_cargo_summary": {
+        "type": "boolean",
+        "description": "default true"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "default 50"
+      }
+    }
+  },
+  "tf3_list_stations": {
+    "type": "object",
+    "properties": {
+      "kind": {
+        "type": "string",
+        "enum": [
+          "passenger",
+          "cargo"
+        ]
+      },
+      "town": {
+        "type": "string"
+      },
+      "name_contains": {
+        "type": "string"
+      },
+      "sort_by": {
+        "type": "string",
+        "enum": [
+          "waitingTotal",
+          "usagePct",
+          "terminals",
+          "name"
+        ]
+      },
+      "limit": {
+        "type": "integer",
+        "description": "default 50"
+      }
+    }
+  },
+  "tf3_list_depots": {
+    "type": "object",
+    "properties": {
+      "carrier": {
+        "type": "string",
+        "enum": [
+          "ROAD",
+          "RAIL",
+          "TRAM",
+          "AIR",
+          "WATER"
+        ]
+      }
+    }
+  },
+  "tf3_finances": {
+    "type": "object",
+    "properties": {}
+  },
+  "tf3_live_vehicles": {
+    "type": "object",
+    "properties": {
+      "line": {
+        "type": "string",
+        "description": "line id or name"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "default 25"
+      }
+    }
+  },
+  "tf3_fleet_issues": {
+    "type": "object",
+    "properties": {
+      "low_usage_pct": {
+        "type": "number",
+        "description": "flag lines below this usage (default 40)"
+      },
+      "high_usage_pct": {
+        "type": "number",
+        "description": "flag lines at or above this usage (default 95)"
+      },
+      "old_ratio": {
+        "type": "number",
+        "description": "flag vehicles at this share of lifespan (default 1.0)"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "default 100 per list"
+      }
+    }
+  }
+}

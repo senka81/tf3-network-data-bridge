@@ -15,6 +15,23 @@ It has two parts:
   downloaded from this repository's releases. (mod.io doesn't allow `.py` files in mods.) Your AI app runs it and it
   asks the game for data whenever the app needs it.
 
+## 2.0.0-dev.1 proposal
+
+This branch adds the separate `mod/mcp_bridge_dev_1` exporter and a proposed
+`2.0.0-dev.1` server with 38 tools. The DEV mod uses bridge protocol **78**;
+package version, protocol version, and mod revision are separate identifiers.
+The original `mod/mcp_bridge_1` is retained for upstream history and compatibility.
+Use only one exporter at a time because both use the same exchange filenames.
+
+The DEV server adds coverage, cargo membership/reachability and delivery diagnostics,
+passenger history, and advisory investigation tools. Game state remains read-only;
+manual passenger-history recording writes local telemetry files. Use a unique
+`save_key` for every independent playthrough. No purchases or construction are automatic.
+
+See [DEV setup, privacy and validation](docs/DEV_2_0.md) before installing.
+The legacy setup instructions below describe upstream production; they download
+upstream releases and do not install this DEV proposal. Do not run them to test this branch.
+
 ## What the AI app can see
 
 - **Lines:** stops and their towns, vehicles, capacity usage, 12-month profit, profit per vehicle, running costs and
