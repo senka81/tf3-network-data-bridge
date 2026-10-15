@@ -1,7 +1,9 @@
 # 2.0.0-dev.1 package
 
 This is a draft integration for the senka81 fork. It preserves the upstream MIT
-license and bsaurusrex creator attribution. No live-game acceptance has been completed.
+license and bsaurusrex creator attribution. The controlled macOS live test passed on
+October 15, 2026; broader production acceptance remains pending. See
+[validation history](VALIDATION_HISTORY.md) for the earlier work and today’s checks.
 
 ## Versions and layout
 
@@ -40,6 +42,45 @@ Review safeguards require explicit history keys, reject malformed protocol messa
 shapes without terminating the process, disclose local history writes, and add the
 standard macOS Steam location to discovery.
 
+## Installation from this branch (DEV only)
+
+There is no published 2.0.0-dev.1 release asset yet. Review the source on the PR
+branch; do not use the upstream release download commands for this version.
+The checked candidate archive contains only the DEV mod, server, license and DEV
+documentation. It does not include the legacy mod, deploy script or test telemetry.
+
+1. Use a copied save and a separate test environment. Locate the TF3 user-data
+   folder from the game's Settings > Advanced > Open User Data Folder.
+2. Copy the **leaf folder** `mod/mcp_bridge_dev_1` into `<userdata>/mods/`, giving
+   `<userdata>/mods/mcp_bridge_dev_1/mod.json`. Do not nest the repository or the
+   outer `mod` folder there. If that destination already exists, do not overwrite
+   it: use another test environment or the separately namespaced test method. The
+   controlled live test used a private mod ID/prefix to avoid replacing an installed
+   DEV mod; those substitutions are not included in the candidate archive.
+3. Save `server/tf3_mcp_server.py` in a separate test-server folder. Use the Python
+   interpreter that has been validated for your platform (Python 3.14 on macOS
+   was tested). The server runtime itself requires no pip packages.
+4. Enable the DEV bridge only on the copied save. Disable other bridge exporters
+   for that copy, leaving unrelated required mods enabled. Keep the original save
+   and working MCP client/tunnel configuration unchanged.
+5. Set `TF3_MCP_BRIDGE_DIR` to that test environment's actual exchange folder and
+   `TF3_HISTORY_DIR` to a new private directory outside the checkout. Launch
+   `python3 -I /path/to/test-server/tf3_mcp_server.py` through a separate stdio
+   client or use `--print` for manual checks. Supply a unique `save_key` to history
+   tools. Never point two active servers at the same exchange/history.
+6. Confirm status, protocol 78 and the active copied save. A history-constrained
+   recording requires valid timing fields; missing conversion now declines the
+   recording instead of silently ignoring spacing.
+
+**Do not run `deploy.ps1` for this DEV package.** It is retained upstream tooling:
+it selects `mod/mcp_bridge_1`, writes to the original staging destination, and can
+carry the original mod.io publication linkage. It is not a DEV installer or safe
+publication path for this fork. Do not upload to the original author's listing.
+
+The mod, server, root LICENSE and relevant docs must travel together in a reviewed
+runtime package. Preserve the MIT notice when redistributing. Review every archive
+member before publishing; ignore rules alone do not prevent disclosure.
+
 ## Isolated setup and acceptance
 
 Use a separate test save and a separate server process/configuration. Back up that
@@ -61,7 +102,8 @@ supported exports, plausible rows and warnings. Record at least three adequately
 times using a unique `save_key`, then inspect history and the v861 advisor. Check
 paused/duplicate reads, save reloads and stale fallback warnings. Restart the server
 after switching saves to avoid short-lived cache reuse from the previous session.
-Native API behavior and large-save frame costs need live verification.
+Native APIs and responsiveness passed the controlled macOS test. Broader workloads
+and long-session performance remain unverified.
 
 ## Local history and security
 
@@ -80,6 +122,9 @@ Do not commit save files, histories, snapshots, tunnel settings, credentials, ca
 or backups. `.gitignore` excludes common local artifacts but cannot replace review.
 
 ## Reproducible validation
+
+Run these checks from the full PR source checkout. The reviewed runtime candidate
+archive intentionally excludes tests, the legacy mod and deployment tooling.
 
 Use Python 3.14 (tested) or another compatible Python environment. Runtime needs no
 third-party packages; only the simulated Lua test requires `lupa` (tested with 2.8).
@@ -130,7 +175,7 @@ The six readiness regressions cover >100 stations, >12 serving lines, missing cu
 stations, mixed freshness in standalone/combined output, interval enforcement and
 invalid conversions, and both simulators with inherited production paths.
 
-After these checks pass, the package is ready for a controlled live test on a separate
-copy of a save, with one exporter/server and separate history storage. Production
-readiness still requires recorded live-game results for native API support, frame
-costs, save reloads, stale fallback and passenger history. Keep the PR draft.
+The controlled test passed all nine exports, history spacing/duplicates, stale-data
+handling, advisor output and reload rollback protection on one copied macOS save.
+The namespace-isolated test variant is not a shipped protocol change. Broader
+platforms, workloads and longer sessions remain unverified. Keep the PR draft.

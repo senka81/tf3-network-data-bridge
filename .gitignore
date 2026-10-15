@@ -15,3 +15,9 @@ mcp_bridge__*
 dev-history/
 history/
 *.log
+
+# Private game saves and local review/test deliverables
+*.sav
+*.sav.*
+outputs/
+live-test-*/
