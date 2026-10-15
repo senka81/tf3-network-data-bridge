@@ -18,7 +18,7 @@ It has two parts:
 ## 2.0.0-dev.1 proposal
 
 This branch adds the separate `mod/mcp_bridge_dev_1` exporter and a proposed
-`2.0.0-dev.1` server with 38 tools. The DEV mod uses bridge protocol **78**;
+`2.0.0-dev.1` server with 31 generic tools and 13 callable compatibility aliases. The DEV mod uses bridge protocol **78**;
 package version, protocol version, and mod revision are separate identifiers.
 The original `mod/mcp_bridge_1` is retained for upstream history and compatibility.
 Use only one exporter at a time because both use the same exchange filenames.
@@ -30,6 +30,7 @@ manual passenger-history recording writes local telemetry files. Use a unique
 
 See [DEV setup, privacy and validation](docs/DEV_2_0.md) before installing, and
 [validation history](docs/VALIDATION_HISTORY.md) for prior work versus PR-specific checks.
+Generic tool names are primary; see the [naming migration](docs/DEV_2_0.md#generic-tool-names-and-compatibility) for preserved legacy calls.
 The legacy setup instructions below describe upstream production; they download
 upstream releases and do not install this DEV proposal. Do not run them to test this branch.
 

@@ -3795,7 +3795,36 @@ for tool in TOOLS:
         schema["properties"]["save_key"].update({"minLength": 1, "maxLength": 96,
             "description": "Unique key for this independent save/playthrough; reuse it for later reads."})
 
-HANDLERS = {t["name"]: t["handler"] for t in TOOLS}
+# Public discovery uses one descriptive name per capability. Keep historical
+# versioned entry points callable with their original schemas and implementations.
+# In particular, older advisors must not suddenly require a history save_key.
+_LEGACY_TOOL_SPECS = {tool["name"]: tool for tool in TOOLS}
+CANONICAL_IMPLEMENTATIONS = {
+    "tf3_cargo_reachability": "tf3_cargo_reachability_v77",
+    "tf3_network_investment_advisor": "tf3_network_investment_advisor_v861",
+    "tf3_passenger_line_diagnostic": "tf3_passenger_line_diagnostic_v82",
+    "tf3_passenger_capacity_advisor": "tf3_passenger_capacity_advisor_v83",
+    "tf3_passenger_history_record": "tf3_passenger_history_record_v84",
+    "tf3_passenger_history_report": "tf3_passenger_history_report_v84",
+    "tf3_passenger_station_history": "tf3_passenger_station_history_v85",
+    "tf3_passenger_service_diagnosis": "tf3_passenger_service_diagnosis_v86",
+}
+COMPATIBILITY_ALIASES = {
+    name: re.sub(r"_v\d+$", "", name)
+    for name in _LEGACY_TOOL_SPECS if re.search(r"_v\d+$", name)
+}
+COMPATIBILITY_TOOLS = [dict(_LEGACY_TOOL_SPECS[name]) for name in COMPATIBILITY_ALIASES]
+TOOLS = []
+for name in list(_LEGACY_TOOL_SPECS) + list(CANONICAL_IMPLEMENTATIONS):
+    if name in COMPATIBILITY_ALIASES or any(t["name"] == name for t in TOOLS):
+        continue
+    source = _LEGACY_TOOL_SPECS[CANONICAL_IMPLEMENTATIONS.get(name, name)]
+    tool = dict(source, name=name)
+    tool["description"] = re.sub(
+        r"^(?:v\d+(?:\.\d+)*\s*(?:DEV\s*)?|2\.0\.0-dev\.1\s+)",
+        "", source["description"])
+    TOOLS.append(tool)
+HANDLERS = {t["name"]: t["handler"] for t in TOOLS + COMPATIBILITY_TOOLS}
 
 # ----------------------------------------------------------------------------------------------------------------
 # MCP over stdio (newline-delimited JSON-RPC 2.0)
@@ -3817,7 +3846,8 @@ def handle(req):
             "serverInfo": {"name": SERVER_NAME, "version": SERVER_VERSION},
             "instructions": "Read-only data from a running Transport Fever 3 game (MCP Bridge mod). Start with "
                             "tf3_status; money values are in game currency; times are game time. "
-                            "Passenger history recording writes local telemetry files; use a unique save_key per playthrough.",
+                            "Passenger history recording writes local telemetry files; use a unique save_key per playthrough. "
+                            "Use generic tool names; historical versioned aliases remain callable for compatibility.",
         }
     if method == "ping":
         return {}

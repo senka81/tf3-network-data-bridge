@@ -1,0 +1,1178 @@
+{
+  "tf3_cargo_reachability_v75": {
+    "handler": "tool_cargo_reachability_v75",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town_contains": {
+          "type": "string"
+        },
+        "cargo": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 5
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "default": 2
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "default": 2
+        },
+        "max_access_km": {
+          "type": "number",
+          "default": 1.0
+        },
+        "max_lines_per_leg": {
+          "type": "integer",
+          "default": 3
+        }
+      }
+    }
+  },
+  "tf3_cargo_reachability": {
+    "handler": "tool_cargo_reachability",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town_contains": {
+          "type": "string"
+        },
+        "cargo": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 10
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "default": 2
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "default": 2
+        },
+        "max_access_km": {
+          "type": "number",
+          "default": 1.0
+        },
+        "max_lines_per_leg": {
+          "type": "integer",
+          "default": 3
+        }
+      }
+    }
+  },
+  "tf3_status": {
+    "handler": "tool_status",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  "tf3_list_lines": {
+    "handler": "tool_list_lines",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "sort_by": {
+          "type": "string",
+          "enum": [
+            "estIncome12m",
+            "name",
+            "profit12m",
+            "profitPerVehicle12m",
+            "runningCostsPerYear",
+            "usagePct",
+            "vehicleCount"
+          ],
+          "description": "default profit12m"
+        },
+        "ascending": {
+          "type": "boolean",
+          "description": "default false (largest first), except for name"
+        },
+        "carrier": {
+          "type": "string",
+          "enum": [
+            "ROAD",
+            "RAIL",
+            "TRAM",
+            "AIR",
+            "WATER"
+          ]
+        },
+        "name_contains": {
+          "type": "string"
+        },
+        "town": {
+          "type": "string",
+          "description": "only lines with a stop in a town whose name contains this"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 50"
+        }
+      }
+    }
+  },
+  "tf3_list_towns": {
+    "handler": "tool_list_towns",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "name_contains": {
+          "type": "string"
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": [
+            "lineUsage",
+            "linesServing",
+            "name",
+            "population",
+            "size"
+          ],
+          "description": "default population"
+        },
+        "ascending": {
+          "type": "boolean",
+          "description": "default false (largest first)"
+        },
+        "include_lines": {
+          "type": "boolean",
+          "description": "list serving lines (default: only when filtering by name)"
+        },
+        "include_cargo": {
+          "type": "boolean",
+          "description": "goods each district needs and the supply vs limit (default: only when filtering by name)"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 100"
+        }
+      }
+    }
+  },
+  "tf3_route_ideas": {
+    "handler": "tool_route_ideas",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string",
+          "description": "only pairs involving towns whose name contains this"
+        },
+        "min_population": {
+          "type": "number",
+          "description": "ignore smaller towns"
+        },
+        "min_distance_km": {
+          "type": "number"
+        },
+        "max_distance_km": {
+          "type": "number",
+          "description": "e.g. 15 for buses, 150 for regional rail"
+        },
+        "include_linked": {
+          "type": "boolean",
+          "description": "also list pairs your lines already link"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 25"
+        }
+      }
+    }
+  },
+  "tf3_get_line": {
+    "handler": "tool_get_line",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "type": "string",
+          "description": "line id or (part of) its name"
+        }
+      },
+      "required": [
+        "line"
+      ]
+    }
+  },
+  "tf3_list_vehicle_models": {
+    "handler": "tool_list_vehicle_models",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "carrier": {
+          "type": "string",
+          "enum": [
+            "ROAD",
+            "RAIL",
+            "TRAM",
+            "AIR",
+            "WATER"
+          ]
+        },
+        "transport_mode": {
+          "type": "string",
+          "description": "e.g. BUS, TRUCK, TRAIN, ELECTRIC_TRAIN, TRAM"
+        },
+        "name_contains": {
+          "type": "string"
+        },
+        "min_capacity": {
+          "type": "integer"
+        },
+        "available_only": {
+          "type": "boolean",
+          "description": "default true"
+        },
+        "include_hidden": {
+          "type": "boolean",
+          "description": "default false"
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": [
+            "capacity",
+            "price",
+            "topSpeedKmh",
+            "powerKw",
+            "lifespanDays"
+          ]
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 60"
+        }
+      }
+    }
+  },
+  "tf3_list_industries": {
+    "handler": "tool_list_industries",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "cargo": {
+          "type": "string",
+          "description": "only industries using or making this cargo, e.g. COAL"
+        },
+        "town": {
+          "type": "string",
+          "description": "closest town name contains"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "missing_inputs",
+            "not_producing",
+            "closing",
+            "unshipped",
+            "all"
+          ],
+          "description": "default all"
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": [
+            "producedPerYear",
+            "shippedPerYear",
+            "level",
+            "name"
+          ]
+        },
+        "include_cargo_summary": {
+          "type": "boolean",
+          "description": "default true"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 50"
+        }
+      }
+    }
+  },
+  "tf3_list_stations": {
+    "handler": "tool_list_stations",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "passenger",
+            "cargo"
+          ]
+        },
+        "town": {
+          "type": "string"
+        },
+        "name_contains": {
+          "type": "string"
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": [
+            "waitingTotal",
+            "usagePct",
+            "terminals",
+            "name"
+          ]
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 50"
+        }
+      }
+    }
+  },
+  "tf3_station_catchment": {
+    "handler": "tool_station_catchment",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string"
+        },
+        "name_contains": {
+          "type": "string"
+        },
+        "station_group_id": {
+          "type": "string"
+        },
+        "include_sample_ids": {
+          "type": "boolean",
+          "description": "default false"
+        },
+        "view": {
+          "type": "string",
+          "enum": [
+            "entities",
+            "groups"
+          ],
+          "description": "default entities; groups combines station entities with conservative unique coverage bounds"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 25, maximum 100"
+        }
+      }
+    }
+  },
+  "tf3_town_coverage": {
+    "handler": "tool_town_coverage",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string",
+          "description": "Required town name; substring accepted only if unambiguous"
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": [
+            "name",
+            "passenger_exclusive",
+            "cargo_exclusive",
+            "passenger_coverage",
+            "cargo_coverage"
+          ],
+          "description": "default name"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 50; max 250 groups"
+        }
+      },
+      "required": [
+        "town"
+      ]
+    }
+  },
+  "tf3_network_coverage_audit": {
+    "handler": "tool_network_coverage_audit",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town_contains": {
+          "type": "string",
+          "description": "Optional town name substring"
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": [
+            "town",
+            "station_groups",
+            "passenger_coverage",
+            "cargo_coverage",
+            "passenger_shared_fraction",
+            "cargo_shared_fraction"
+          ],
+          "description": "default town"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 50, maximum 200 towns"
+        }
+      }
+    }
+  },
+  "tf3_network_opportunities": {
+    "handler": "tool_network_opportunities",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town_contains": {
+          "type": "string",
+          "description": "optional town substring"
+        },
+        "focus": {
+          "type": "string",
+          "enum": [
+            "all",
+            "passenger",
+            "cargo",
+            "unserved"
+          ],
+          "description": "default all"
+        },
+        "min_waiting": {
+          "type": "integer",
+          "description": "queue flag threshold, default 25"
+        },
+        "include_unflagged": {
+          "type": "boolean",
+          "description": "default false"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 50, maximum 100"
+        }
+      }
+    }
+  },
+  "tf3_cargo_network_scan": {
+    "handler": "tool_cargo_network_scan",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town_contains": {
+          "type": "string",
+          "description": "Optional town substring; omit to scan whole save"
+        },
+        "cargo": {
+          "type": "string",
+          "description": "Optional cargo code, e.g. MEAT"
+        },
+        "only_unmet": {
+          "type": "boolean",
+          "description": "Default true"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "Maximum cargo needs in output, default 20, max 100"
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "description": "Default 3, max 5"
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "description": "Default 2, max 5"
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": [
+            "unmet_supply",
+            "town"
+          ]
+        }
+      }
+    }
+  },
+  "tf3_cargo_infrastructure_audit": {
+    "handler": "tool_cargo_infrastructure_audit",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string",
+          "description": "Exact destination town e.g. Timmins"
+        },
+        "cargo": {
+          "type": "string",
+          "description": "Optional commodity e.g. MEAT"
+        },
+        "suppliers_per_need": {
+          "type": "integer",
+          "description": "Default 2; max 10"
+        },
+        "input_suppliers_per_cargo": {
+          "type": "integer",
+          "description": "Default 1; max 8"
+        },
+        "nearby_stations": {
+          "type": "integer",
+          "description": "Default 3; max 10"
+        }
+      },
+      "required": [
+        "town"
+      ]
+    }
+  },
+  "tf3_cargo_chain_planner": {
+    "handler": "tool_cargo_chain_planner",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string",
+          "description": "Required destination town, e.g. Timmins"
+        },
+        "cargo": {
+          "type": "string",
+          "description": "Optional cargo code, e.g. MEAT"
+        },
+        "suppliers_per_need": {
+          "type": "integer",
+          "description": "Default 10, max 20"
+        },
+        "input_suppliers_per_cargo": {
+          "type": "integer",
+          "description": "Default 3, max 12"
+        }
+      },
+      "required": [
+        "town"
+      ]
+    }
+  },
+  "tf3_cargo_supply_opportunities": {
+    "handler": "tool_cargo_supply_opportunities",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string",
+          "description": "optional case-insensitive town substring, e.g. Timmins"
+        },
+        "cargo": {
+          "type": "string",
+          "description": "optional cargo code, e.g. MEAT or BRICKS"
+        },
+        "sort_by": {
+          "type": "string",
+          "enum": [
+            "unmet_supply",
+            "town",
+            "supply_fraction"
+          ]
+        },
+        "suppliers_per_need": {
+          "type": "integer",
+          "description": "default 5, max 20"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 50, max 200"
+        }
+      }
+    }
+  },
+  "tf3_list_depots": {
+    "handler": "tool_list_depots",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "carrier": {
+          "type": "string",
+          "enum": [
+            "ROAD",
+            "RAIL",
+            "TRAM",
+            "AIR",
+            "WATER"
+          ]
+        }
+      }
+    }
+  },
+  "tf3_finances": {
+    "handler": "tool_finances",
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  "tf3_live_vehicles": {
+    "handler": "tool_live_vehicles",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "line": {
+          "type": "string",
+          "description": "line id or name"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 25"
+        }
+      }
+    }
+  },
+  "tf3_fleet_issues": {
+    "handler": "tool_fleet_issues",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "low_usage_pct": {
+          "type": "number",
+          "description": "flag lines below this usage (default 40)"
+        },
+        "high_usage_pct": {
+          "type": "number",
+          "description": "flag lines at or above this usage (default 95)"
+        },
+        "old_ratio": {
+          "type": "number",
+          "description": "flag vehicles at this share of lifespan (default 1.0)"
+        },
+        "limit": {
+          "type": "integer",
+          "description": "default 100 per list"
+        }
+      }
+    }
+  },
+  "tf3_cargo_access_audit": {
+    "handler": "tool_cargo_access_audit",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string"
+        },
+        "industry_id": {
+          "type": "integer"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "tf3_cargo_reachability_v77": {
+    "handler": "tool_cargo_reachability_v77",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town_contains": {
+          "type": "string"
+        },
+        "cargo": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 5
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "default": 2
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "default": 1
+        },
+        "max_access_km": {
+          "type": "number",
+          "default": 1.0
+        },
+        "max_lines_per_leg": {
+          "type": "integer",
+          "default": 3
+        },
+        "detailed": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    }
+  },
+  "tf3_town_delivery_audit": {
+    "handler": "tool_town_delivery_audit",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "tf3_freight_delivery_audit": {
+    "handler": "tool_freight_delivery_audit",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+  "tf3_network_investment_advisor": {
+    "handler": "tool_network_investment_advisor",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "default": 8
+        },
+        "town_contains": {
+          "type": "string"
+        },
+        "cargo_scan_limit": {
+          "type": "integer",
+          "default": 20
+        },
+        "passenger_scan_limit": {
+          "type": "integer",
+          "default": 35
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "default": 3
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "default": 2
+        },
+        "max_access_km": {
+          "type": "number",
+          "default": 1.0
+        },
+        "max_lines_per_leg": {
+          "type": "integer",
+          "default": 3
+        },
+        "min_waiting": {
+          "type": "integer",
+          "default": 50
+        }
+      }
+    }
+  },
+  "tf3_network_investment_advisor_v81": {
+    "handler": "tool_network_investment_advisor_v81",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "default": 8
+        },
+        "town_contains": {
+          "type": "string"
+        },
+        "cargo_scan_limit": {
+          "type": "integer",
+          "default": 40
+        },
+        "passenger_scan_limit": {
+          "type": "integer",
+          "default": 100
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "default": 3
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "default": 2
+        },
+        "max_access_km": {
+          "type": "number",
+          "default": 1.0
+        },
+        "max_lines_per_leg": {
+          "type": "integer",
+          "default": 3
+        },
+        "min_waiting": {
+          "type": "integer",
+          "default": 50
+        }
+      }
+    }
+  },
+  "tf3_passenger_line_diagnostic_v82": {
+    "handler": "tool_passenger_line_diagnostic_v82",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string"
+        },
+        "line_contains": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 15
+        }
+      }
+    }
+  },
+  "tf3_network_investment_advisor_v82": {
+    "handler": "tool_network_investment_advisor_v82",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "default": 8
+        },
+        "town_contains": {
+          "type": "string"
+        },
+        "cargo_scan_limit": {
+          "type": "integer",
+          "default": 40
+        },
+        "passenger_scan_limit": {
+          "type": "integer",
+          "default": 100
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "default": 3
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "default": 2
+        },
+        "max_access_km": {
+          "type": "number",
+          "default": 1.0
+        },
+        "max_lines_per_leg": {
+          "type": "integer",
+          "default": 3
+        },
+        "min_waiting": {
+          "type": "integer",
+          "default": 50
+        }
+      }
+    }
+  },
+  "tf3_passenger_capacity_advisor_v83": {
+    "handler": "tool_passenger_capacity_advisor_v83",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "town": {
+          "type": "string"
+        },
+        "line_contains": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "default": 15
+        },
+        "min_station_waiting": {
+          "type": "number",
+          "default": 20
+        }
+      }
+    }
+  },
+  "tf3_network_investment_advisor_v83": {
+    "handler": "tool_network_investment_advisor_v83",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "default": 8
+        },
+        "town_contains": {
+          "type": "string"
+        },
+        "cargo_scan_limit": {
+          "type": "integer",
+          "default": 40
+        },
+        "passenger_scan_limit": {
+          "type": "integer",
+          "default": 100
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "default": 3
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "default": 2
+        },
+        "max_access_km": {
+          "type": "number",
+          "default": 1.0
+        },
+        "max_lines_per_leg": {
+          "type": "integer",
+          "default": 3
+        },
+        "min_waiting": {
+          "type": "integer",
+          "default": 50
+        },
+        "min_station_waiting": {
+          "type": "number",
+          "default": 20
+        }
+      }
+    }
+  },
+  "tf3_passenger_history_record_v84": {
+    "handler": "tool_passenger_history_record_v84",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "save_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "description": "Unique key for this independent save/playthrough; reuse it for later reads."
+        },
+        "min_game_days": {
+          "type": "number",
+          "default": 0
+        },
+        "max_samples": {
+          "type": "integer",
+          "default": 120
+        }
+      },
+      "required": [
+        "save_key"
+      ]
+    }
+  },
+  "tf3_passenger_history_report_v84": {
+    "handler": "tool_passenger_history_report_v84",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "save_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "description": "Unique key for this independent save/playthrough; reuse it for later reads."
+        },
+        "town": {
+          "type": "string"
+        },
+        "line_contains": {
+          "type": "string"
+        },
+        "min_station_waiting": {
+          "type": "number",
+          "default": 20
+        },
+        "limit": {
+          "type": "integer",
+          "default": 20
+        }
+      },
+      "required": [
+        "save_key"
+      ]
+    }
+  },
+  "tf3_passenger_station_history_v85": {
+    "handler": "tool_passenger_station_history_v85",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "save_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "description": "Unique key for this independent save/playthrough; reuse it for later reads."
+        },
+        "town": {
+          "type": "string"
+        },
+        "min_station_waiting": {
+          "type": "number",
+          "default": 20
+        },
+        "limit": {
+          "type": "integer",
+          "default": 20
+        }
+      },
+      "required": [
+        "save_key"
+      ]
+    }
+  },
+  "tf3_network_investment_advisor_v85": {
+    "handler": "tool_network_investment_advisor_v85",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "save_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "description": "Unique key for this independent save/playthrough; reuse it for later reads."
+        },
+        "limit": {
+          "type": "integer",
+          "default": 8
+        },
+        "town_contains": {
+          "type": "string"
+        },
+        "cargo_scan_limit": {
+          "type": "integer",
+          "default": 40
+        },
+        "passenger_scan_limit": {
+          "type": "integer",
+          "default": 100
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "default": 3
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "default": 2
+        },
+        "max_access_km": {
+          "type": "number",
+          "default": 1.0
+        },
+        "max_lines_per_leg": {
+          "type": "integer",
+          "default": 3
+        },
+        "min_waiting": {
+          "type": "integer",
+          "default": 50
+        },
+        "min_station_waiting": {
+          "type": "number",
+          "default": 20
+        }
+      },
+      "required": [
+        "save_key"
+      ]
+    }
+  },
+  "tf3_passenger_service_diagnosis_v86": {
+    "handler": "tool_passenger_service_diagnosis_v86",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "save_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "description": "Unique key for this independent save/playthrough; reuse it for later reads."
+        },
+        "town": {
+          "type": "string"
+        },
+        "min_station_waiting": {
+          "type": "number",
+          "default": 20
+        },
+        "limit": {
+          "type": "integer",
+          "default": 15
+        }
+      },
+      "required": [
+        "town",
+        "save_key"
+      ]
+    }
+  },
+  "tf3_network_investment_advisor_v861": {
+    "handler": "tool_network_investment_advisor_v861",
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "save_key": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "description": "Unique key for this independent save/playthrough; reuse it for later reads."
+        },
+        "limit": {
+          "type": "integer",
+          "default": 8
+        },
+        "town_contains": {
+          "type": "string"
+        },
+        "cargo_scan_limit": {
+          "type": "integer",
+          "default": 40
+        },
+        "passenger_scan_limit": {
+          "type": "integer",
+          "default": 100
+        },
+        "factories_per_need": {
+          "type": "integer",
+          "default": 3
+        },
+        "input_sources_per_factory": {
+          "type": "integer",
+          "default": 2
+        },
+        "max_access_km": {
+          "type": "number",
+          "default": 1.0
+        },
+        "max_lines_per_leg": {
+          "type": "integer",
+          "default": 3
+        },
+        "min_waiting": {
+          "type": "integer",
+          "default": 50
+        },
+        "min_station_waiting": {
+          "type": "number",
+          "default": 20
+        }
+      },
+      "required": [
+        "save_key"
+      ]
+    }
+  }
+}

@@ -8,7 +8,7 @@ class ReviewTests(unittest.TestCase):
   for name, schema in old.items():
    current=next(t for t in m.TOOLS if t['name']==name)
    self.assertEqual(schema,current['inputSchema'])
-  self.assertEqual(len(m.TOOLS),len(m.HANDLERS))
+  self.assertEqual(len(m.TOOLS)+len(m.COMPATIBILITY_TOOLS),len(m.HANDLERS))
  def test_history_isolation(self):
   snap={'towns':[{'id':1,'name':'Town'}]}
   with self.assertRaises(ValueError):m._v84_identity(snap,{})

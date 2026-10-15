@@ -8,7 +8,7 @@ October 15, 2026; broader production acceptance remains pending. See
 ## Versions and layout
 
 - DEV package/display label: 2.0.0-dev.1.
-- Proposed Python server: 2.0.0-dev.1, standard library only, 38 tools.
+- Proposed Python server: 2.0.0-dev.1, standard library only; 31 generic tools advertised and 13 callable legacy aliases.
 - Lua bridgeVersion: 78; unchanged between the v8.6 and v8.6.1 development folders.
 - DEV mod revision: 8; adds snapshot timing fields needed for history spacing.
 - `mod/mcp_bridge_dev_1` is the DEV exporter. Keep its resource ID stable for saves.
@@ -25,7 +25,7 @@ versioned tool names remain stable for client compatibility.
 
 ## Changes
 
-The 12 original upstream tools and their schemas remain. Twenty-six tools add
+The 12 original upstream tools and their schemas remain. Additional capabilities add
 catchment aggregation, coverage, freight opportunity/reachability investigations,
 industry cargo-access membership, town-building delivery membership, passenger
 history, and passenger service/capacity diagnostics. These observations do not
@@ -36,11 +36,50 @@ v8.6.1 fixes the combined advisor's passenger-line handoff: it now retrieves the
 full station/line diagnostic rather than passing `servingLines` where `lines` was
 expected. It raises an explicit error if historical capacity and service-pattern
 classifications disagree. Clients using `tf3_network_investment_advisor_v86` must
-switch to `tf3_network_investment_advisor_v861`; the standalone v86 diagnosis remains.
+use `tf3_network_investment_advisor`; historical versioned entry points remain
+callable with their existing behavior during migration.
 
 Review safeguards require explicit history keys, reject malformed protocol message
 shapes without terminating the process, disclose local history writes, and add the
 standard macOS Steam location to discovery.
+
+## Generic tool names and compatibility
+
+`tools/list` now advertises 31 unique generic names, with one primary capability
+per function. Thirteen historical versioned names remain accepted by `tools/call`
+and `--print`, but are omitted from discovery to avoid duplicate choices. Existing
+clients with saved versioned calls can continue using them; new clients should use
+the generic names. All 38 names from the previous registry remain callable, plus
+six new generic passenger names (44 accepted names total).
+
+| Primary name | Historical compatibility entry points |
+|---|---|
+| `tf3_cargo_reachability` | `tf3_cargo_reachability_v75`, `tf3_cargo_reachability_v77` |
+| `tf3_network_investment_advisor` | `tf3_network_investment_advisor_v81`, `_v82`, `_v83`, `_v85`, `_v861` |
+| `tf3_passenger_line_diagnostic` | `tf3_passenger_line_diagnostic_v82` |
+| `tf3_passenger_capacity_advisor` | `tf3_passenger_capacity_advisor_v83` |
+| `tf3_passenger_history_record` | `tf3_passenger_history_record_v84` |
+| `tf3_passenger_history_report` | `tf3_passenger_history_report_v84` |
+| `tf3_passenger_station_history` | `tf3_passenger_station_history_v85` |
+| `tf3_passenger_service_diagnosis` | `tf3_passenger_service_diagnosis_v86` |
+
+The generic cargo reachability entry now selects the v77 implementation, and the
+generic investment advisor selects the corrected v861 implementation. Its schema
+requires an explicit `save_key`. This is an intentional upgrade of the two existing
+generic entry points; clients wanting the latest behavior should refresh discovery
+and supply the advertised arguments.
+
+Compatibility means retaining each old versioned entry's schema and implementation.
+Older advisor versions are not silently redirected to the history-aware latest
+advisor: callers that never supplied a history key remain compatible. Therefore
+legacy advisor results need not equal the latest generic advisor's results. The
+latest aliases and their generic names share implementations. Internal Python
+function names and historical result-version labels remain implementation/history
+details; this change does not rename saved history files or game resource IDs.
+
+Package version, protocol 78 and mod revision 8 are unchanged by the registry
+migration. A future release can retire aliases only after a separate compatibility
+review. No automatic retirement is scheduled.
 
 ## Installation from this branch (DEV only)
 
@@ -99,7 +138,7 @@ Do not use `--setup` unless you intend to modify Claude configuration.
 Confirm `tf3_status`, the active save and protocol 78 before using new tools. Check
 `tf3_station_catchment`, `tf3_cargo_access_audit` and `tf3_town_delivery_audit` for
 supported exports, plausible rows and warnings. Record at least three adequately spaced advancing game
-times using a unique `save_key`, then inspect history and the v861 advisor. Check
+times using a unique `save_key`, then inspect history and the generic investment advisor. Check
 paused/duplicate reads, save reloads and stale fallback warnings. Restart the server
 after switching saves to avoid short-lived cache reuse from the previous session.
 Native APIs and responsiveness passed the controlled macOS test. Broader workloads
@@ -136,6 +175,7 @@ python3 -m venv .venv
 .venv/bin/python tests/test_review_safeguards.py
 .venv/bin/python tests/test_v861_integration.py
 .venv/bin/python tests/test_live_readiness.py
+.venv/bin/python tests/test_generic_tools.py
 .venv/bin/python tests/mod_server_integration_test.py
 ```
 

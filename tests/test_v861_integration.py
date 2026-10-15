@@ -29,7 +29,7 @@ try:
     m._v85_station_rows=stationrows
     m._v85_line_history_index=lambda history,town,threshold: {str(line['lineId']):{'historyGrade':('persistent_full_and_busy_shared_stations' if town=='TestFullTown' else 'mixed_or_unconfirmed'),'meanUtilizationPct':line['usagePct']} for line in source[town][0]['lines']}
     m.tool_passenger_line_diagnostic_v82=lambda args, _complete=False:{'stations':source[args['town']]}
-    result=m.tool_network_investment_advisor_v861({'save_key':'synthetic-save'})
+    result=m.HANDLERS['tf3_network_investment_advisor']({'save_key':'synthetic-save'})
     cl,ma,ca=result['recommendations']
     assert cl['servicePatternDiagnosis']['capacityReviewCount']==1,cl
     assert cl['servicePatternDiagnosis']['servicePatternReviewCount']==0,cl
@@ -41,7 +41,7 @@ try:
     print('PASS: TestFullTown capacity, TestMixedTown service-pattern, cargo untouched, lines populated')
     # Negative test: Contradiction produces explicit error, not silent bad advice.
     m._v85_line_history_index=lambda history,town,threshold:{}
-    try:m.tool_network_investment_advisor_v861({'save_key':'synthetic-save'})
+    try:m.HANDLERS['tf3_network_investment_advisor']({'save_key':'synthetic-save'})
     except RuntimeError as e:assert 'TestFullTown' in str(e);print('PASS: classification conflict detection')
     else:raise AssertionError('Mismatch must fail loudly')
 finally:

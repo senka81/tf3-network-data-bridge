@@ -79,3 +79,13 @@ passed regression fixtures; this live save did not independently establish both.
 Shared release exchange filenames and trusted local-directory assumptions remain
 operational limits. Three observations provide preliminary advisory evidence only.
 Keep the PR draft until the owner explicitly chooses the next release step.
+
+## Generic-name migration after live acceptance
+
+The registry was subsequently changed to advertise 31 generic tools while preserving
+13 callable historical aliases. The original live acceptance above tested the
+previous 38-name registry, not this later discovery layout. New naming regressions
+check canonical handler/schema selection, all historical entry points, legacy
+behavior preservation, uniqueness, stdio discovery and alias dispatch. The advisor
+fixture now exercises the generic registry entry. Existing safeguards and simulator
+suites are repeated for the registry change; no new live-game acceptance is claimed.
