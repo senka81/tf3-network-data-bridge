@@ -2,18 +2,25 @@
 
 ## Earlier development — October 14 evening (user's “last night”)
 
-The v8.6/v8.6.1 development packages already documented live bridge/advisor checks,
-manual history reuse, passenger service diagnosis, and the combined advisor's
-serving-line handoff fix. Existing live exchange artifacts and prior history were
-present before this PR work. The user confirms substantial testing was already done.
-This was not an untested bridge starting from zero.
+The supplied shared conversation records a successful live bridge connection,
+discovery of all 38 tools under protocol 78, and a completed v8.6.1 combined
+investment-advisor run. This confirms that live advisor execution had already been
+exercised before this PR work; today's run was not its first successful execution.
 
-The retained development README described how to test the combined and standalone
-advisors, and the supplied v8.6.1 regression fixture checked populated serving lines,
-capacity versus service-pattern cases, cargo preservation and conflict detection.
-A README command or expected result is not a complete execution log: this review
-cannot independently certify every earlier live assertion, exact revision or test
-count. No private old logs or history are published here.
+That earlier advisor reported zero passenger-history samples for its selected save
+identity. The conversation separately refers to five development observations, but
+that reference does not prove those observations were available to the production
+advisor. Do not treat the earlier live run as validation of production history lookup
+or silently migrate/combine old histories. Today’s explicit-key, separate-history
+test establishes recording and reporting for the test identity only; it does not
+resolve the earlier production-history lookup discrepancy.
+
+The development packages also documented passenger diagnosis, history reuse, and
+the v8.6.1 serving-line handoff regression fixture. The shared conversation contains
+reported outcomes and pasted analysis, not the complete underlying tool trace or
+all uploaded files. Exact earlier assertion counts and source revision remain
+unverified. No private transcript details, save identifiers, paths, raw observations
+or per-town findings are reproduced here.
 
 ## PR preparation and review — October 15
 
