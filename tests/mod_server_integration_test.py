@@ -230,7 +230,9 @@ time.sleep(0.3)
 spec = importlib.util.spec_from_file_location("srv", os.path.join(ROOT, "server", "tf3_mcp_server.py"))
 srv = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(srv)
-srv.userdata_dirs = lambda: [out]  # look for the hello file in the test folder
+srv.userdata_dirs = lambda: [out]
+# Bind the exchange directly: inherited production env must never select a live folder.
+srv.bridge_dir = lambda: os.path.join(out, "mod_presets")
 
 checks = []
 exchange = srv.bridge_dir()
@@ -254,6 +256,19 @@ catchment = srv.tool_station_catchment({})
 catchgroups = srv.tool_station_catchment({'view':'groups'})
 access = srv.tool_cargo_access_audit({})
 delivery = srv.tool_town_delivery_audit({})
+# Exercise the actual Lua snapshot's timing conversion through history recording.
+from unittest.mock import patch
+with tempfile.TemporaryDirectory() as history_dir, patch.dict(os.environ, {'TF3_HISTORY_DIR':history_dir}):
+    original_snapshot = srv.load_snapshot
+    actual_snapshot = snap_b
+    srv.load_snapshot = lambda: (actual_snapshot, None, 0)
+    try:
+        history_first = srv.tool_passenger_history_record_v84({'save_key':'simulator'})
+        advanced = dict(actual_snapshot, meta=dict(actual_snapshot['meta'], gameTime=actual_snapshot['meta']['gameTime']+1))
+        srv.load_snapshot = lambda: (advanced, None, 0)
+        history_second = srv.tool_passenger_history_record_v84({'save_key':'simulator','min_game_days':1})
+    finally:
+        srv.load_snapshot = original_snapshot
 stop.set(); loop.join(2)
 
 leftovers = os.listdir(exchange)
@@ -327,6 +342,11 @@ extra_checks = [
                        and summary["linesChecked"] == 0),
 ]
 checks += extra_checks
+checks += [
+ ('snapshot timing metadata', snap_b['meta']['yearTicks']>0 and snap_b['meta']['dayTicks']==snap_b['meta']['yearTicks']/365),
+ ('Lua snapshot history records', history_first['recorded']),
+ ('Lua snapshot enforces day spacing', history_second['status']=='minimum_game_interval_not_reached'),
+]
 checks += [
  ('catchment rows', catchment['totalMatching']==2),
  ('catchment deduplicates entities', sorted(r['passenger']['count'] for r in catchment['stationCatchments'])==[1,2]),

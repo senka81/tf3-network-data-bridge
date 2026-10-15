@@ -8,7 +8,7 @@ license and bsaurusrex creator attribution. No live-game acceptance has been com
 - DEV package/display label: 2.0.0-dev.1.
 - Proposed Python server: 2.0.0-dev.1, standard library only, 38 tools.
 - Lua bridgeVersion: 78; unchanged between the v8.6 and v8.6.1 development folders.
-- DEV mod revision: 7; unchanged because the runtime exporter is unchanged.
+- DEV mod revision: 8; adds snapshot timing fields needed for history spacing.
 - `mod/mcp_bridge_dev_1` is the DEV exporter. Keep its resource ID stable for saves.
 - `mod/mcp_bridge_1` is the retained upstream exporter, not the intended companion
   for new tools requiring protocol 78.
@@ -57,7 +57,7 @@ Do not use `--setup` unless you intend to modify Claude configuration.
 
 Confirm `tf3_status`, the active save and protocol 78 before using new tools. Check
 `tf3_station_catchment`, `tf3_cargo_access_audit` and `tf3_town_delivery_audit` for
-supported exports, plausible rows and warnings. Record two or more advancing game
+supported exports, plausible rows and warnings. Record at least three adequately spaced advancing game
 times using a unique `save_key`, then inspect history and the v861 advisor. Check
 paused/duplicate reads, save reloads and stale fallback warnings. Restart the server
 after switching saves to avoid short-lived cache reuse from the previous session.
@@ -90,6 +90,7 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -r tests/requirements-dev.txt
 .venv/bin/python tests/test_review_safeguards.py
 .venv/bin/python tests/test_v861_integration.py
+.venv/bin/python tests/test_live_readiness.py
 .venv/bin/python tests/mod_server_integration_test.py
 ```
 
@@ -100,7 +101,7 @@ classification, cargo preservation and conflict detection.
 
 The adapted upstream simulator runs the actual DEV Lua and proposed server against
 fake game APIs and its own temporary exchange. It checks all nine request types,
-50 assertions, multipart/Unicode responses, cleanup, original outputs, catchment
+53 assertions, multipart/Unicode responses, cleanup, original outputs, catchment
 deduplication, cargo industry membership and town-building membership. Its fake
 catchment API deliberately returns repeated IDs. It does not touch a live game.
 
@@ -108,3 +109,28 @@ The original `tests/bridge_test.py` remains an upstream production-mod regressio
 Run it independently; it creates its own temporary exchange. To test stdio fallback,
 pass that run's printed `<out>/mod_presets` path to `tests/server_test.py`. The latter
 now accepts additive tools while requiring the 12 original names in their relative order.
+
+## Live-readiness review fixes
+
+Both simulated bridges bind their exchange path directly to a temporary directory,
+ignoring inherited production environment settings. The readiness suite runs both
+with a decoy live path and verifies its files remain unchanged.
+
+Passenger classification uses all current town stations and serving lines before
+applying public display limits. Missing or stale current observations yield
+`insufficient_current_evidence`; standalone and combined diagnostics retain current
+warnings and ages. Public v82 display limits remain unchanged.
+
+The protocol-78 snapshot now adds `yearTicks` and `dayTicks`. With `min_game_days`
+greater than zero, recording declines if timing conversion is unavailable and rejects
+non-finite or negative intervals. Existing history files remain compatible. The DEV
+simulator verifies actual Lua timing fields through history recording.
+
+The six readiness regressions cover >100 stations, >12 serving lines, missing current
+stations, mixed freshness in standalone/combined output, interval enforcement and
+invalid conversions, and both simulators with inherited production paths.
+
+After these checks pass, the package is ready for a controlled live test on a separate
+copy of a save, with one exporter/server and separate history storage. Production
+readiness still requires recorded live-game results for native API support, frame
+costs, save reloads, stale fallback and passenger history. Keep the PR draft.

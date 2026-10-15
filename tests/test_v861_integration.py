@@ -28,7 +28,7 @@ try:
         return ([{'stationGroupId':st['stationGroupId'],'station':st['station'],'meanWaiting':st['waitingPassengersSnapshot'], 'busyObservations':5,'samplesObserved':5,'busyFraction':1.0,'trendStatus':'persistent_busy_station'}],[])
     m._v85_station_rows=stationrows
     m._v85_line_history_index=lambda history,town,threshold: {str(line['lineId']):{'historyGrade':('persistent_full_and_busy_shared_stations' if town=='Clinton' else 'mixed_or_unconfirmed'),'meanUtilizationPct':line['usagePct']} for line in source[town][0]['lines']}
-    m.tool_passenger_line_diagnostic_v82=lambda args:{'stations':source[args['town']]}
+    m.tool_passenger_line_diagnostic_v82=lambda args, _complete=False:{'stations':source[args['town']]}
     result=m.tool_network_investment_advisor_v861({'save_key':'Ontario-main'})
     cl,ma,ca=result['recommendations']
     assert cl['servicePatternDiagnosis']['capacityReviewCount']==1,cl

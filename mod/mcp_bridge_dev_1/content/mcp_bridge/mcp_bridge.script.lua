@@ -271,6 +271,8 @@ local function encodeSnapshot()
 		bridgeVersion = VERSION,
 		requestId = ctx.id,
 		gameTime = ctx.gameTime,
+		yearTicks = ctx.yearTicks,
+		dayTicks = ctx.dayTicks,
 		date = ctx.date,
 		money = ctx.money,
 		time = ctx.time,

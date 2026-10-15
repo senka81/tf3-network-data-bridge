@@ -15,6 +15,7 @@ Set TF3_MCP_BRIDGE_DIR to the exchange folder to skip the search, TF3_MCP_TIMEOU
 """
 import glob
 import hashlib
+import math
 import tempfile
 from pathlib import Path
 import json
@@ -3149,7 +3150,7 @@ TOOLS.append({'name':'tf3_network_investment_advisor_v81',
 
 
 # v8.2 DEV: station-to-line diagnostic with explicit queue attribution uncertainty.
-def tool_passenger_line_diagnostic_v82(args):
+def tool_passenger_line_diagnostic_v82(args, *, _complete=False):
     snap, w1, age1 = load_snapshot()
     data, w2, age2 = load_kind('stations')
     town_filter = str(args.get('town') or '').strip().casefold()
@@ -3182,12 +3183,12 @@ def tool_passenger_line_diagnostic_v82(args):
         rows.sort(key=lambda x:(x.get('intervalSec') is None,-(x.get('intervalSec') or 0),str(x.get('line') or '')))
         results.append({'town':town,'stationGroupId':st.get('id'),'station':st.get('name'),
             'waitingPassengersSnapshot':round(pax,2),'stationUsagePct':pct(usage.get('used') or 0,capacity),
-            'passengerLinesServing':len(rows),'lines':rows[:12],
+            'passengerLinesServing':len(rows),'lines':rows if _complete else rows[:12],
             'interpretation':'Waiting passengers belong to the station group, not necessarily any displayed line.'})
     results.sort(key=lambda x:(-x['waitingPassengersSnapshot'],x['town'],str(x['station'])))
     return {'scope':'passenger_station_line_diagnostic','version':'8.2-dev',
-        'matchingPassengerStations':len(results),'returnedStations':min(limit,len(results)),
-        'stations':results[:limit],
+        'matchingPassengerStations':len(results),'returnedStations':len(results) if _complete else min(limit,len(results)),
+        'stations':results if _complete else results[:limit],
         'caveats':['Station queue shared among all serving lines, never attributed to one line',
             'Line usage is aggregate recent load, not station-specific','Interval is derived from reported line frequency',
             'Profit is last 12 game months, not incremental profit from adding vehicles',
@@ -3432,7 +3433,11 @@ def tool_passenger_history_record_v84(args):
                 'historyPath':str(path)}
     year=meta.get('yearTicks')
     min_days=float(args.get('min_game_days',0) or 0)
-    if min_days<0:raise ValueError('min_game_days must be >= 0')
+    if not math.isfinite(min_days) or min_days<0:
+        raise ValueError('min_game_days must be finite and >= 0')
+    if min_days and (not isinstance(year,(int,float)) or not math.isfinite(year) or year<=0):
+        return {'status':'game_time_conversion_unavailable','recorded':False,
+                'reason':'Cannot enforce min_game_days without valid snapshot meta.yearTicks'}
     if min_days and samples and isinstance(year,(int,float)) and year>0 and gt-float(samples[-1]['gameTime'])<year*min_days/365.0:
         return {'status':'minimum_game_interval_not_reached','recorded':False,'saveKey':label,
                 'gameTime':gt,'sampleCount':len(samples),'minimumGameDays':min_days,'historyPath':str(path)}
@@ -3669,11 +3674,14 @@ def _v86_service_diagnosis(town, args, samples=None, current=None):
         samples,label,warnings=_v85_history(args)
     else:
         label=str(args.get('save_key') or 'automatic');warnings=[]
-    stationrows,_=_v85_station_rows(samples,town,threshold,2000)
+    stationrows,_=_v85_station_rows(samples,town,threshold,None)
     persistent=[st for st in stationrows if st['trendStatus']=='persistent_busy_station']
     linehist=_v85_line_history_index(samples,town,threshold)
     if current is None:
-        current=tool_passenger_line_diagnostic_v82({'town':town,'limit':150})
+        current=tool_passenger_line_diagnostic_v82({'town':town,'limit':150}, _complete=True)
+    current_warnings=current.get('warnings') or []
+    warnings=list(dict.fromkeys(warnings+current_warnings))
+    current_age=current.get('dataAgeSec')
     stations=current.get('stations') or []
     current_by_id={str(st.get('stationGroupId')):st for st in stations}
     findings=[]
@@ -3689,7 +3697,8 @@ def _v86_service_diagnosis(town, args, samples=None, current=None):
                 'historyGrade':hist.get('historyGrade','history_unavailable'),
                 'meanUtilizationPct':hist.get('meanUtilizationPct')})
         persistent_capacity=any(ln.get('historyGrade') in ('persistent_full_and_busy_shared_stations','repeated_high_utilization_unattributed_queue') for ln in annotated)
-        if len(samples)<3 or st['samplesObserved']<3: action='monitor_insufficient_history'
+        if current_warnings or not sl: action='insufficient_current_evidence'
+        elif len(samples)<3 or st['samplesObserved']<3: action='monitor_insufficient_history'
         elif persistent_capacity:action='capacity_review_with_service_validation'
         else:action='service_pattern_review_before_capacity'
         intervals=[v['intervalSec'] for v in annotated if isinstance(v.get('intervalSec'),(int,float)) and v['intervalSec']>0]
@@ -3700,7 +3709,8 @@ def _v86_service_diagnosis(town, args, samples=None, current=None):
             'servingLines':annotated,'lineCount':len(annotated),
             'reportedIntervalSecRange':[min(intervals),max(intervals)] if intervals else None,
             'investigation':action,
-            'nextCheck':('Check repeated directional vehicle loads and left-behind passengers before changing fleet.' if persistent_capacity else
+            'nextCheck':('Refresh current station and complete serving-line observations before classifying service or capacity.' if action=='insufficient_current_evidence' else
+              'Check repeated directional vehicle loads and left-behind passengers before changing fleet.' if persistent_capacity else
               'Inspect intended destinations, transfer access, route direction, and scheduled arrivals; do not add vehicles from shared queues alone.'),
             'queueAttribution':'shared_station_not_line_specific'})
     findings.sort(key=lambda r:-r['meanWaiting'])
@@ -3709,7 +3719,8 @@ def _v86_service_diagnosis(town, args, samples=None, current=None):
        'stations':findings[:max(1,min(150,int(args.get('limit',15))))],
        'servicePatternReviewCount':sum(r['investigation']=='service_pattern_review_before_capacity' for r in findings),
        'capacityReviewCount':sum(r['investigation']=='capacity_review_with_service_validation' for r in findings),
-       'warnings':warnings,
+       'warnings':warnings,'currentDataAgeSec':current_age,
+       'insufficientCurrentEvidenceCount':sum(r['investigation']=='insufficient_current_evidence' for r in findings),
        'caveats':['Shared station queues do not identify intended boarding line, direction, journey or transfer.',
          'Line intervals are service-level reported estimates, not actual departures at this stop.',
          'Current line details and stored historical samples may be from different game times.',
@@ -3734,20 +3745,25 @@ def tool_network_investment_advisor_v861(args):
         if rec.get('category')!='passenger':continue
         town=rec.get('town') or ''
         if town not in town_cache:
-            current=tool_passenger_line_diagnostic_v82({'town':town,'limit':150})
+            current=tool_passenger_line_diagnostic_v82({'town':town,'limit':150}, _complete=True)
             diag=_v86_service_diagnosis(town,args,samples,current=current)
             town_cache[town]=diag
         diag=town_cache[town]
         rec['servicePatternDiagnosis']={'persistentStationsFound':diag['persistentStationsFound'],
               'capacityReviewCount':diag['capacityReviewCount'],
               'servicePatternReviewCount':diag['servicePatternReviewCount'],
-              'priorityStations':diag['stations'][:3]}
+              'priorityStations':diag['stations'][:3],
+              'warnings':diag['warnings'],'currentDataAgeSec':diag['currentDataAgeSec'],
+              'insufficientCurrentEvidenceCount':diag['insufficientCurrentEvidenceCount']}
+        report['historyWarnings']=list(dict.fromkeys((report.get('historyWarnings') or [])+diag['warnings']))
         historic_capacity=(rec.get('historicalAssessment')=='persistent_capacity_investigation_priority')
         diag_capacity=diag['capacityReviewCount']>0
         # Failing loudly is safer than emitting contradictory passenger advice.
-        if historic_capacity and not diag_capacity:
+        if historic_capacity and not diag_capacity and not diag['insufficientCurrentEvidenceCount']:
             raise RuntimeError('Historical passenger capacity and service-pattern classifications disagree for '+town)
-        if diag_capacity:
+        if diag['insufficientCurrentEvidenceCount']:
+            rec['suggestedNextAction']='Refresh missing or stale station and serving-line evidence before classifying service or capacity'
+        elif diag_capacity:
             rec['suggestedNextAction']='Review repeatedly full lines and busy station patterns; verify directional left-behind passengers and vehicle capacity before buying'
         elif diag['servicePatternReviewCount']:
             rec['suggestedNextAction']='Investigate persistent shared queues, departure directions, and transfer patterns before adding vehicles'
