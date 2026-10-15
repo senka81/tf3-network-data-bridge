@@ -226,7 +226,9 @@ time.sleep(0.3)
 spec = importlib.util.spec_from_file_location("srv", os.path.join(ROOT, "server", "tf3_mcp_server.py"))
 srv = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(srv)
-srv.userdata_dirs = lambda: [out]  # look for the hello file in the test folder
+srv.userdata_dirs = lambda: [out]
+# Bind the exchange directly: inherited production env must never select a live folder.
+srv.bridge_dir = lambda: os.path.join(out, "mod_presets")
 
 checks = []
 exchange = srv.bridge_dir()

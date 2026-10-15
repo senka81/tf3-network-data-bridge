@@ -1,0 +1,2 @@
+# Test-only Lua runtime; the MCP server itself uses the standard library.
+lupa==2.8

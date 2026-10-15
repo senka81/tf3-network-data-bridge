@@ -15,6 +15,25 @@ It has two parts:
   downloaded from this repository's releases. (mod.io doesn't allow `.py` files in mods.) Your AI app runs it and it
   asks the game for data whenever the app needs it.
 
+## 2.0.0-dev.1 proposal
+
+This branch adds the separate `mod/mcp_bridge_dev_1` exporter and a proposed
+`2.0.0-dev.1` server with 31 generic tools and 13 callable compatibility aliases. The DEV mod uses bridge protocol **78**;
+package version, protocol version, and mod revision are separate identifiers.
+The original `mod/mcp_bridge_1` is retained for upstream history and compatibility.
+Use only one exporter at a time because both use the same exchange filenames.
+
+The DEV server adds coverage, cargo membership/reachability and delivery diagnostics,
+passenger history, and advisory investigation tools. Game state remains read-only;
+manual passenger-history recording writes local telemetry files. Use a unique
+`save_key` for every independent playthrough. No purchases or construction are automatic.
+
+See [DEV setup, privacy and validation](docs/DEV_2_0.md) before installing, and
+[validation history](docs/VALIDATION_HISTORY.md) for prior work versus PR-specific checks.
+Generic tool names are primary; see the [naming migration](docs/DEV_2_0.md#generic-tool-names-and-compatibility) for preserved legacy calls.
+The legacy setup instructions below describe upstream production; they download
+upstream releases and do not install this DEV proposal. Do not run them to test this branch.
+
 ## What the AI app can see
 
 - **Lines:** stops and their towns, vehicles, capacity usage, 12-month profit, profit per vehicle, running costs and
@@ -37,7 +56,7 @@ lines and the vehicles available.
 
 <p align="center"><img src="docs/example-rail-plan.png" alt="Example rail plan drawn from live game data" width="720"></p>
 
-## Setup
+## Legacy upstream setup (not the DEV package)
 
 You need Transport Fever 3 on Windows, [Python 3.8 or newer](https://www.python.org/downloads/) and an AI app that
 supports MCP servers.
@@ -130,11 +149,11 @@ answer and says how old it is.
 - **Everything stays on your PC.** The mod and the server only read game data and exchange local files. Neither one
   opens a network connection. Your AI app sends the tool results to its AI service, like any other conversation
   content.
-- **Read-only.** The mod contains no code that changes your game, such as building, buying or selling. A request can
-  only ask for one of two kinds of data.
+- **Read-only.** The mod contains no code that changes your game, such as building, buying or selling. The DEV exporter supports
+  nine request kinds. Passenger history recording additionally writes local telemetry.
 - **Files it touches.** The server writes one request file and deletes only `mcp_bridge__*` files, and only in the
-  exchange folder. The game loads the request file as Lua, the same way it loads any user data file. So anything able
-  to write to your user data folder could already change the game in other ways, and the bridge adds no new risk.
+  exchange folder. The game loads the request file as Lua, the same way it loads any user data file. Use trusted, user-owned exchange directories; there are
+  remaining local-input and symlink risks described in the DEV guide.
 - **Names in the results.** Line, station and town names in the tool results come from your save. In a save from
   someone else, treat them as untrusted text.
 - **`--setup`** edits only the `tf3` entry in your app's config. Before its first change, it saves the original
@@ -142,7 +161,8 @@ answer and says how old it is.
 
 ## Development
 
-- `deploy.ps1` copies the mod into the game's `staging_area` folder and generates `_content.json`.
+- `deploy.ps1` is legacy upstream tooling for `mod/mcp_bridge_1`; do not run it to
+  install or publish this DEV fork. See [DEV installation](docs/DEV_2_0.md).
 - `tests/bridge_test.py` runs the real mod Lua against a fake game API and a game-like user data store, while the
   real server code sends requests and reads the answers. It needs `pip install lupa`.
 - `tests/server_test.py <output>/mod_presets` drives the MCP protocol against the folder the bridge test leaves

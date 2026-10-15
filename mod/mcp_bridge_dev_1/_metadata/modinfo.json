@@ -1,0 +1,15 @@
+{
+  "authors": [
+    {
+      "name": "bsaurusrex",
+      "role": "CREATOR"
+    }
+  ],
+  "name": "TF3 Network Bridge 2.0.0-dev.1",
+  "summary": "Read-only network exports for the 2.0.0-dev.1 planner; exporter protocol 78.",
+  "description": "Experimental 2.0.0-dev.1 package: coverage, cargo-access and town-delivery exports with passenger history and advisory tools in the companion server. Exporter bridgeVersion 78. Enable only this bridge on a separate test save; disable the original Network Data Bridge while testing. Live-game acceptance remains pending.",
+  "tags": [
+    "Script Mod"
+  ],
+  "url": "https://github.com/senka81/tf3-network-data-bridge"
+}

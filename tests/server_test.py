@@ -29,7 +29,8 @@ check("initialize", r["result"]["serverInfo"]["name"] == "tf3-mcp-bridge")
 rpc(None, "notifications/initialized")
 r = rpc(2, "tools/list")
 names = [t["name"] for t in r["result"]["tools"]]
-check("12 tools", names == ["tf3_status", "tf3_list_lines", "tf3_list_towns", "tf3_route_ideas", "tf3_get_line", "tf3_list_vehicle_models", "tf3_list_industries", "tf3_list_stations", "tf3_list_depots", "tf3_finances", "tf3_live_vehicles", "tf3_fleet_issues"])
+baseline_names = list(json.load(open(os.path.join(os.path.dirname(__file__), "fixtures", "upstream_tool_schemas.json"))))
+check("original 12 tools preserved", [name for name in names if name in baseline_names] == baseline_names and len(names) == len(set(names)))
 
 def call(i, name, args=None):
     r = rpc(i, "tools/call", {"name": name, "arguments": args or {}})

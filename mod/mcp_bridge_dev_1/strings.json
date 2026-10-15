@@ -1,0 +1,15 @@
+{
+	"en": {
+		"param_budget_name": "CPU per frame",
+		"param_budget_tooltip": "Time spent collecting data each frame while answering a request. Light never causes stutter; Fast answers big networks sooner.",
+		"param_budget_light": "Light",
+		"param_budget_normal": "Normal",
+		"param_budget_fast": "Fast",
+		"param_towns_name": "Town list",
+		"param_towns_tooltip": "Include every town with its population, size and public transport reach. Stops are always labelled with their town.",
+		"param_logEach_name": "Log every update",
+		"param_logEach_tooltip": "Write a line to the game log after each answer (for troubleshooting).",
+		"param_yes": "Yes",
+		"param_no": "No"
+	}
+}
